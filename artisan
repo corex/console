@@ -1,0 +1,23 @@
+#!/usr/bin/env php
+<?php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$artisan = new \CoRex\Console\Artisan();
+
+// Set name on artisan.
+//$artisan->setName('name');
+
+// Set version on artisan.
+//$artisan->setVersion('x.y.z');
+
+// Add single command (can be called more than once).
+//$artisan->addCommand(MyCommand::class);
+
+// Add multiple commands on specified path (can be called more than once).
+//$artisan->addCommandsOnPath(path-to-commands, true, '');
+
+// Hide internal commands.
+$artisan->hideInternalCommands();
+
+// Execute artisan. It is possible to execute command directly by specifying it on execute().
+$artisan->execute();
