@@ -20,7 +20,7 @@ class MakeArtisanCommand extends BaseCommand
      *
      * @var string
      */
-    protected $description = 'Make artisan';
+    protected $description = 'Make artisan in project root';
 
     /**
      * Handle.
