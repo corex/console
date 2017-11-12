@@ -5,7 +5,7 @@ namespace CoRex\Console\Commands;
 use CoRex\Console\BaseCommand;
 use CoRex\Console\Path;
 
-class MakeCommand extends BaseCommand
+class MakeCommandCommand extends BaseCommand
 {
     protected $signature = 'make:command
         {namespace : Namespace of command (/ will be converted to \)}
