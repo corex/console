@@ -57,27 +57,30 @@ class Artisan
      * Add command.
      *
      * @param string $command
+     * @param boolean $hidden Default null which means command decide.
      * @throws \Exception
      */
-    public function addCommand($command)
+    public function addCommand($command, $hidden = null)
     {
         if (!is_string($command)) {
             throw new \Exception('You must specify class.');
         }
-        if (!in_array($command, $this->commands)) {
-            $this->commands[] = $command;
-        }
+        $this->commands[$command] = $hidden;
     }
 
     /**
      * Add commands on path.
      *
      * @param string $path
+     * @param boolean $hidden Default null which means command decide.
      * @param boolean $recursive Default true.
-     * @param string $commandSuffix Default 'Command'.
+     * @param string $commandSuffix Default null.
      */
-    public function addCommandsOnPath($path, $recursive = true, $commandSuffix = 'Command')
+    public function addCommandsOnPath($path, $hidden = null, $recursive = true, $commandSuffix = null)
     {
+        if ($commandSuffix === null) {
+            $commandSuffix = 'Command';
+        }
         if (substr($commandSuffix, -4) != '.php') {
             $commandSuffix .= '.php';
         }
@@ -99,11 +102,11 @@ class Artisan
             if (substr($file, -strlen($commandSuffix)) == $commandSuffix) {
                 $class = $this->extractFullClass($path . '/' . $file);
                 if ($class != '') {
-                    $this->addCommand($class);
+                    $this->addCommand($class, $hidden);
                 }
             }
             if (is_dir($path . '/' . $file) && $recursive) {
-                $this->addCommandsOnPath($path . '/' . $file, $recursive, $commandSuffix);
+                $this->addCommandsOnPath($path . '/' . $file, $hidden, $recursive, $commandSuffix);
             }
         }
     }
@@ -139,8 +142,12 @@ class Artisan
 
             // Add instance of commands.
             if (count($this->commands) > 0) {
-                foreach ($this->commands as $command) {
-                    $app->add(new $command());
+                foreach ($this->commands as $command => $hidden) {
+                    $commandObject = $this->newCommandObject($command);
+                    if ($hidden !== null) {
+                        $commandObject->setHidden($hidden);
+                    }
+                    $app->add($commandObject);
                 }
             }
 
@@ -254,5 +261,16 @@ class Artisan
             $style->setBackground($background);
         }
         return $style->apply($text);
+    }
+
+    /**
+     * New command object.
+     *
+     * @param string $commandClass
+     * @return BaseCommand
+     */
+    private function newCommandObject($commandClass)
+    {
+        return new $commandClass();
     }
 }

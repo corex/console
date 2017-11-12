@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $artisan = new \CoRex\Console\Artisan();
@@ -14,7 +15,7 @@ $artisan = new \CoRex\Console\Artisan();
 //$artisan->addCommand(MyCommand::class);
 
 // Add multiple commands on specified path (can be called more than once).
-//$artisan->addCommandsOnPath(path-to-commands, true, '');
+$artisan->addCommandsOnPath(path-to-commands);
 
 // Hide internal commands.
 $artisan->hideInternalCommands();
