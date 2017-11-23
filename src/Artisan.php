@@ -5,6 +5,7 @@ namespace CoRex\Console;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -29,28 +30,35 @@ class Artisan
      * Set name.
      *
      * @param string $name
+     * @return $this
      */
     public function setName($name)
     {
         $this->name = $name;
+        return $this;
     }
 
     /**
      * Set version.
      *
      * @param string $version
+     * @return $this
      */
     public function setVersion($version)
     {
         $this->version = $version;
+        return $this;
     }
 
     /**
      * Hide internal commands.
+     *
+     * @return $this
      */
     public function hideInternalCommands()
     {
         $this->showInternalCommands = false;
+        return $this;
     }
 
     /**
@@ -58,6 +66,7 @@ class Artisan
      *
      * @param string $command
      * @param boolean $hidden Default null which means command decide.
+     * @return $this
      * @throws \Exception
      */
     public function addCommand($command, $hidden = null)
@@ -66,6 +75,7 @@ class Artisan
             throw new \Exception('You must specify class.');
         }
         $this->commands[$command] = $hidden;
+        return $this;
     }
 
     /**
@@ -75,6 +85,7 @@ class Artisan
      * @param boolean $hidden Default null which means command decide.
      * @param boolean $recursive Default true.
      * @param string $commandSuffix Default null.
+     * @return $this
      */
     public function addCommandsOnPath($path, $hidden = null, $recursive = true, $commandSuffix = null)
     {
@@ -89,11 +100,11 @@ class Artisan
             $path = rtrim($path, '//');
         }
         if (!is_dir($path)) {
-            return;
+            return $this;
         }
         $files = scandir($path);
         if (count($files) == 0) {
-            return;
+            return $this;
         }
         foreach ($files as $file) {
             if (substr($file, 0, 1) == '.') {
@@ -109,12 +120,46 @@ class Artisan
                 $this->addCommandsOnPath($path . '/' . $file, $hidden, $recursive, $commandSuffix);
             }
         }
+        return $this;
+    }
+
+    /**
+     * Add commands on package.
+     *
+     * @param string $vendor
+     * @param string $package
+     * @param string $additionalPath Default null.
+     * @param boolean $hidden Default null which means command decide.
+     * @param boolean $recursive Default true.
+     * @param string $commandSuffix Default null.
+     * @return $this
+     * @throws \Exception
+     */
+    public function addCommandsOnPackage(
+        $vendor,
+        $package,
+        $additionalPath = null,
+        $hidden = null,
+        $recursive = true,
+        $commandSuffix = null
+    ) {
+        $segments = [];
+        if ($additionalPath !== null) {
+            $segments[] = $additionalPath;
+        }
+        $path = Path::package($vendor, $package, $segments);
+        if (!is_dir($path)) {
+            throw new \Exception('Path ' . $path . ' does not exist.');
+        }
+        $this->addCommandsOnPath($path, $hidden, $recursive, $commandSuffix);
+        return $this;
     }
 
     /**
      * Execute console application.
      *
      * @param string $signature Default null which means all.
+     * @return integer Exit code.
      */
     public function execute($signature = null)
     {
@@ -135,7 +180,7 @@ class Artisan
         try {
 
             // Setup.
-            $container = new Container();
+            $container = Container::getInstance();
             $dispatcher = new Dispatcher($container);
             $app = new Application($container, $dispatcher, $this->version);
             $app->setName($this->name);
@@ -170,7 +215,7 @@ class Artisan
             print($message . "\n");
         }
 
-        exit(intval($exitCode));
+        return intval($exitCode);
     }
 
     /**
