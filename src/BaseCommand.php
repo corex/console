@@ -88,10 +88,10 @@ abstract class BaseCommand extends IlluminateCommand
      * Write words.
      *
      * @param array $words
-     * @param string $style Default ''.
      * @param string $separator Default ', '.
+     * @throws \Exception
      */
-    public function words(array $words, $style = '', $separator = ', ')
+    public function words(array $words, $separator = ', ')
     {
         $this->write(implode($separator, $words));
     }
@@ -113,6 +113,7 @@ abstract class BaseCommand extends IlluminateCommand
      * @param array $data
      * @param string $separator Default ':'.
      * @param string $prefix Default null.
+     * @throws \Exception
      */
     public function properties(array $data, $separator = ':', $prefix = null)
     {

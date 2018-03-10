@@ -5,7 +5,6 @@ namespace CoRex\Console;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -86,6 +85,7 @@ class Artisan
      * @param boolean $recursive Default true.
      * @param string $commandSuffix Default null.
      * @return $this
+     * @throws \Exception
      */
     public function addCommandsOnPath($path, $hidden = null, $recursive = true, $commandSuffix = null)
     {
@@ -160,15 +160,16 @@ class Artisan
      *
      * @param string $signature Default null which means all.
      * @return integer Exit code.
+     * @throws \Exception
      */
     public function execute($signature = null)
     {
         // Set name and version if not set.
         if ($this->name === null) {
-            $this->name = Constants::TITLE;
+            $this->name = 'CoRex Console';
         }
         if ($this->version === null) {
-            $this->version = Constants::VERSION;
+            $this->version = '';
         }
 
         // Add internal commands.
@@ -316,6 +317,6 @@ class Artisan
      */
     private function newCommandObject($commandClass)
     {
-        return new $commandClass();
+        return Container::getInstance()->make($commandClass);
     }
 }
