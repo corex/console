@@ -14,6 +14,7 @@ class MakeCommandCommand extends BaseCommand
 
     /**
      * Run command.
+     * @throws \Exception
      */
     public function handle()
     {

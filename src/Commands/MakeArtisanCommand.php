@@ -24,6 +24,7 @@ class MakeArtisanCommand extends BaseCommand
 
     /**
      * Handle.
+     * @throws \Exception
      */
     public function handle()
     {
