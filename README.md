@@ -7,6 +7,9 @@ Laravel has a package called illuminate/console which makes an excellent job of 
 
 Package corex/console makes it possible to have commands outside Laravel + a little more.
 
+- Support for Commands extending Illuminate\Console\Command.
+- Support for Commands extending Symfony\Component\Console\Command\Command.
+
 ## Installation
 - Run "composer require corex/console".
 
