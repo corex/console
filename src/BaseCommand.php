@@ -100,11 +100,11 @@ abstract class BaseCommand extends IlluminateCommand
      * Throw error-message as exception.
      *
      * @param string $message
-     * @throws \Exception
+     * @throws ConsoleException
      */
     public function throwError($message)
     {
-        throw new \Exception($this->applyStyle($message, 'white', 'red'));
+        throw new ConsoleException($this->applyStyle($message, 'white', 'red'));
     }
 
     /**
