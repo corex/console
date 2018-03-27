@@ -1,24 +1,17 @@
 #!/usr/bin/env php
 <?php
 
-require_once(__DIR__ . '/vendor/autoload.php');
+// Load composer.
+require_once(__DIR__ . '/src/Composer.php');
+if (!\CoRex\Console\Composer::found()) {
+    die('Composer vendor autoload.php not found.');
+}
+\CoRex\Console\Composer::load();
 
-$artisan = new \CoRex\Console\Artisan();
-
-// Set name on artisan.
-//$artisan->setName('name');
-
-// Set version on artisan.
-//$artisan->setVersion('x.y.z');
-
-// Add single command (can be called more than once).
-//$artisan->addCommand(MyCommand::class);
-
-// Add multiple commands on specified path (can be called more than once).
-$artisan->addCommandsOnPath(path-to-commands);
-
-// Hide internal commands.
-$artisan->hideInternalCommands();
-
-// Execute artisan. It is possible to execute command directly by specifying it on execute().
-$artisan->execute();
+try {
+    $artisan = new \CoRex\Console\Artisan();
+    $artisan->addCommandsOnPath(__DIR__ . '/Commands');
+    $artisan->execute();
+} catch (Exception $e) {
+    print($e->getMessage() . "\n");
+}

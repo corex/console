@@ -7,26 +7,25 @@ Laravel has a package called illuminate/console which makes an excellent job of 
 
 Package corex/console makes it possible to have commands outside Laravel + a little more.
 
-- Support for Commands extending Illuminate\Console\Command.
-- Support for Commands extending Symfony\Component\Console\Command\Command.
+- Support for Commands using Laravel's implementation of commands.
+- Support for Commands using Symfony's implementation of commands.
+
 
 ## Installation
 - Run "composer require corex/console".
 
-Run "php artisan" to see list of available commands.
-
 
 ## Commands (internal).
-- make:artisan - This command creates a new "artisan" in project root (can be modified to suit your needs).
+- make:artisan - This command creates a new "artisan" in project root (created artisan can be modified to suit your needs).
 - make:command - This command creates a new command in current directory.
 
 A note on "artisan" file.
-- It is possible to specify a signature on "$artisan->execute()" so it will execute command instead of showing list of commands.
+- It is possible to specify array of parameters or signature, on "$artisan->execute()" so it will execute command instead of showing list of commands.
 - It is possible to override the property $hidden on commands on adding indidual command or scan for commands.
 
 
 ## Command
-Go to Laravel's documentation https://laravel.com/docs/5.5/artisan to read how to write commands
+Go to Laravel's documentation to read how to write commands.
 
 Every command created must end in "Command.php" i.e. "MyCommand.php". Otherwise it will not be added to list of available commands. It is possible to change that in Artisan setup.
 

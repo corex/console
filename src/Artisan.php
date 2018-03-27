@@ -2,9 +2,11 @@
 
 namespace CoRex\Console;
 
+use CoRex\Support\Obj;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
+use Symfony\Component\Console\Application as SymfonyConsoleApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -15,6 +17,7 @@ class Artisan
     private $version;
     private $commands;
     private $showInternalCommands;
+    private $application;
 
     /**
      * Artisan constructor.
@@ -23,6 +26,20 @@ class Artisan
     {
         $this->commands = [];
         $this->showInternalCommands = true;
+    }
+
+    /**
+     * Set application.
+     *
+     * @param object $application
+     * @throws ConsoleException
+     */
+    public function setApplication($application)
+    {
+        if (!is_object($application)) {
+            throw new ConsoleException('Specified application is not an object.');
+        }
+        $this->application = $application;
     }
 
     /**
@@ -66,12 +83,12 @@ class Artisan
      * @param string $command
      * @param boolean $hidden Default null which means command decide.
      * @return $this
-     * @throws \Exception
+     * @throws ConsoleException
      */
     public function addCommand($command, $hidden = null)
     {
         if (!is_string($command)) {
-            throw new \Exception('You must specify class.');
+            throw new ConsoleException('You must specify class.');
         }
         $this->commands[$command] = $hidden;
         return $this;
@@ -85,7 +102,7 @@ class Artisan
      * @param boolean $recursive Default true.
      * @param string $commandSuffix Default null.
      * @return $this
-     * @throws \Exception
+     * @throws ConsoleException
      */
     public function addCommandsOnPath($path, $hidden = null, $recursive = true, $commandSuffix = null)
     {
@@ -133,7 +150,7 @@ class Artisan
      * @param boolean $recursive Default true.
      * @param string $commandSuffix Default null.
      * @return $this
-     * @throws \Exception
+     * @throws ConsoleException
      */
     public function addCommandsOnPackage(
         $vendor,
@@ -149,7 +166,7 @@ class Artisan
         }
         $path = Path::package($vendor, $package, $segments);
         if (!is_dir($path)) {
-            throw new \Exception('Path ' . $path . ' does not exist.');
+            throw new ConsoleException('Path ' . $path . ' does not exist.');
         }
         $this->addCommandsOnPath($path, $hidden, $recursive, $commandSuffix);
         return $this;
@@ -158,12 +175,22 @@ class Artisan
     /**
      * Execute console application.
      *
-     * @param string $signature Default null which means all.
+     * @param string|array $signatureOrParameters Default null which means all.
      * @return integer Exit code.
-     * @throws \Exception
+     * @throws ConsoleException
      */
-    public function execute($signature = null)
+    public function execute($signatureOrParameters = null)
     {
+        // Set arguments.
+        $argv = $_SERVER['argv'];
+        if ($signatureOrParameters !== null) {
+            if (is_string($signatureOrParameters)) {
+                $signatureOrParameters = [$signatureOrParameters];
+            }
+            $argv = $signatureOrParameters;
+            array_unshift($argv, 'artisan');
+        }
+
         // Set name and version if not set.
         if ($this->name === null) {
             $this->name = 'CoRex Console';
@@ -183,8 +210,21 @@ class Artisan
             // Setup.
             $container = Container::getInstance();
             $dispatcher = new Dispatcher($container);
-            $app = new Application($container, $dispatcher, $this->version);
-            $app->setName($this->name);
+
+            // If application is not set, set standard.
+            if ($this->application === null) {
+                $this->application = new Application($container, $dispatcher, $this->version);
+            }
+
+            // Check if application is extended correctly.
+            if (!Obj::hasExtends($this->application, SymfonyConsoleApplication::class)) {
+                $message = 'Application ' . get_class($this->application);
+                $message .= ' does not extend ' . SymfonyConsoleApplication::class;
+                throw new ConsoleException($message);
+            }
+
+            // Set name.
+            $this->application->setName($this->name);
 
             // Add instance of commands.
             if (count($this->commands) > 0) {
@@ -193,21 +233,12 @@ class Artisan
                     if ($hidden !== null) {
                         $commandObject->setHidden($hidden);
                     }
-                    $app->add($commandObject);
+                    $this->application->add($commandObject);
                 }
             }
 
-            // Prepare argv.
-            $argv = $_SERVER['argv'];
-            if ($signature !== null) {
-                reset($argv);
-                $firstElement = array_shift($argv);
-                array_unshift($argv, $signature);
-                array_unshift($argv, $firstElement);
-            }
-
             // Execute.
-            $exitCode = $app->run(
+            $exitCode = $this->application->run(
                 new ArgvInput($argv),
                 new ConsoleOutput()
             );

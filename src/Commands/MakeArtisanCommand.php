@@ -4,6 +4,7 @@ namespace CoRex\Console\Commands;
 
 use CoRex\Console\BaseCommand;
 use CoRex\Console\Path;
+use CoRex\Support\System\File;
 
 class MakeArtisanCommand extends BaseCommand
 {
@@ -40,7 +41,13 @@ class MakeArtisanCommand extends BaseCommand
         }
 
         try {
-            copy(dirname(dirname(__DIR__)) . '/artisan', $filename);
+            // Dump template.
+            $templateFilename = Path::packageCurrent(['templates', 'artisan.tpl']);
+            $template = file_get_contents($templateFilename);
+            File::put($filename, $template);
+
+            // Change to execute.
+            chmod($filename, 0700);
         } catch (\Exception $e) {
             $this->throwError($e->getMessage());
         }

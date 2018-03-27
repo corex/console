@@ -18,8 +18,8 @@ class SymfonyTestCommand extends Command
     }
 
     /**
-     * @param InputInterface $input The input instance
-     * @param OutputInterface $output The output instance
+     * @param InputInterface $input The input instance.
+     * @param OutputInterface $output The output instance.
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
