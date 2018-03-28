@@ -17,7 +17,7 @@
         "php": ">=7.0",
         "illuminate/console": "^5.5",
         "illuminate/events": "^5.5",
-        "corex/support": "^2.5"
+        "corex/support": "^3.0"
     },
     "autoload": {
         "psr-4": {
