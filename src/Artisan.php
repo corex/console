@@ -237,6 +237,17 @@ class Artisan
                 }
             }
 
+            // Execute configure method if CoRex Console Command.
+            if (Obj::hasMethod('configure', $commandObject) && Obj::hasExtends($commandObject, BaseCommand::class)) {
+                try {
+                    $reflectionMethod = new \ReflectionMethod(get_class($commandObject), 'configure');
+                    $reflectionMethod->setAccessible(true);
+                    $reflectionMethod->invoke($commandObject);
+                } catch (\ReflectionException $e) {
+                    // Do nothing.
+                }
+            }
+
             // Execute.
             $exitCode = $this->application->run(
                 new ArgvInput($argv),
