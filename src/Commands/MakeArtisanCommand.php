@@ -2,9 +2,10 @@
 
 namespace CoRex\Console\Commands;
 
+use CoRex\Console\Artisan;
 use CoRex\Console\BaseCommand;
+use CoRex\Console\Builder;
 use CoRex\Console\Path;
-use CoRex\Support\System\File;
 
 class MakeArtisanCommand extends BaseCommand
 {
@@ -34,23 +35,23 @@ class MakeArtisanCommand extends BaseCommand
         if (strpos($name, '.') !== false) {
             $this->throwError('It is not allowed to specify extension.');
         }
-
         $filename = Path::root([$name]);
+
+        // Check if artisan already exist.
         if (file_exists($filename)) {
             $this->throwError('Artisan ' . $name . ' already exists.');
         }
 
-        try {
-            // Dump template.
-            $templateFilename = Path::packageCurrent(['templates', 'artisan.tpl']);
-            $template = file_get_contents($templateFilename);
-            File::put($filename, $template);
+        // Build and save.
+        Builder::template('artisan')->tokens([
+            'class' => Artisan::class,
+            'hide' => true,
+            'name' => 'CoRex Console',
+            'version' => ''
+        ])->save($filename);
 
-            // Change to execute.
-            chmod($filename, 0700);
-        } catch (\Exception $e) {
-            $this->throwError($e->getMessage());
-        }
+        // Change to execute.
+        chmod($filename, 0700);
 
         // Show explanation.
         $this->line('');

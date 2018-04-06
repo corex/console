@@ -69,11 +69,12 @@ class Artisan
     /**
      * Hide internal commands.
      *
+     * @param boolean $hide
      * @return $this
      */
-    public function hideInternalCommands()
+    public function hideInternalCommands($hide = true)
     {
-        $this->showInternalCommands = false;
+        $this->showInternalCommands = !$hide;
         return $this;
     }
 
@@ -233,18 +234,21 @@ class Artisan
                     if ($hidden !== null) {
                         $commandObject->setHidden($hidden);
                     }
-                    $this->application->add($commandObject);
-                }
-            }
 
-            // Execute configure method if CoRex Console Command.
-            if (Obj::hasMethod('configure', $commandObject) && Obj::hasExtends($commandObject, BaseCommand::class)) {
-                try {
-                    $reflectionMethod = new \ReflectionMethod(get_class($commandObject), 'configure');
-                    $reflectionMethod->setAccessible(true);
-                    $reflectionMethod->invoke($commandObject);
-                } catch (\ReflectionException $e) {
-                    // Do nothing.
+                    // Execute configure method if CoRex Console Command.
+                    $hasMethod = Obj::hasMethod('configure', $commandObject);
+                    $hasExtends = Obj::hasExtends($commandObject, BaseCommand::class);
+                    if ($hasMethod && $hasExtends) {
+                        try {
+                            $reflectionMethod = new \ReflectionMethod(get_class($commandObject), 'configure');
+                            $reflectionMethod->setAccessible(true);
+                            $reflectionMethod->invoke($commandObject);
+                        } catch (\ReflectionException $e) {
+                            // Do nothing.
+                        }
+                    }
+
+                    $this->application->add($commandObject);
                 }
             }
 

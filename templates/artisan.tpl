@@ -2,14 +2,10 @@
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 try {
-    $artisan = new \CoRex\Console\Artisan();
-    $artisan->hideInternalCommands();
-
-    // Set name on artisan.
-    //$artisan->setName('name');
-
-    // Set version on artisan.
-    //$artisan->setVersion('x.y.z');
+    $artisan = new \{class}();
+    $artisan->hideInternalCommands({hide});
+    $artisan->setName('{name}');
+    $artisan->setVersion('{version}');
 
     // Add single command.
     //$artisan->addCommand(MyCommand::class);
