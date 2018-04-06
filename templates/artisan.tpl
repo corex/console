@@ -3,6 +3,8 @@
 require_once(__DIR__ . '/vendor/autoload.php');
 try {
     $artisan = new \CoRex\Console\Artisan();
+    $artisan->hideInternalCommands();
+
     // Set name on artisan.
     //$artisan->setName('name');
 
