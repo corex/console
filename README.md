@@ -1,7 +1,10 @@
 # CoRex Console
 Console framework based on illuminate/console (artisan, commands, visibility).
 
-**_Versioning for this package follows http://semver.org/. Backwards compatibility might break on upgrade to major versions._**
+![License](https://img.shields.io/packagist/l/corex/console.svg)
+![Build Status](https://travis-ci.org/corex/console.svg?branch=master)
+![codecov](https://codecov.io/gh/corex/console/branch/master/graph/badge.svg)
+
 
 Laravel has a package called illuminate/console which makes an excellent job of serving commands.
 
